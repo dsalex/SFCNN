@@ -2,11 +2,12 @@
 
 #include "activations.hpp"
 
+
 double Sigmoid::operator()(const double x) const {
     return 1.0 / (1.0 + exp(-x));
 }
 
-arma::mat Sigmoid::operator()(const arma::mat& value) const {
+Matrix Sigmoid::operator()(const Matrix& value) const {
     auto result = value;
     for (int i = 0; i < result.n_rows; ++i)
         for (int j = 0; j < result.n_cols; ++j)
@@ -19,7 +20,7 @@ double Sigmoid::Deriv(const double x) const {
     return sigmoid * (1 - sigmoid);
 }
 
-arma::mat Sigmoid::Deriv(const arma::mat& value) const {
+Matrix Sigmoid::Deriv(const Matrix& value) const {
     auto result = value;
     for (int i = 0; i < result.n_rows; ++i)
         for (int j = 0; j < result.n_cols; ++j)
@@ -27,3 +28,30 @@ arma::mat Sigmoid::Deriv(const arma::mat& value) const {
     return result;
 }
 
+
+double Identity::operator()(const double x) const {
+    return x;
+}
+
+Matrix Identity::operator()(const Matrix& value) const {
+    return value;
+}
+
+double Identity::Deriv(const double x) const {
+    return x;
+}
+
+Matrix Identity::Deriv(const Matrix& value) const {
+    return value;
+}
+
+
+Activation* make_activation(const std::string& actName) {
+    if (actName == "sigmoid") {
+        return new Sigmoid();
+    } else if (actName == "identity") {
+        return new Identity();
+    } else {
+        throw std::logic_error("Unknown activation function name");
+    }
+}

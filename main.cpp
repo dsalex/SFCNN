@@ -12,20 +12,15 @@ int main() {
 
     cout << A*B << endl;
 
-    std::vector<size_t> layers;
-    layers.push_back(10);
-    layers.push_back(8);
-    layers.push_back(5);
-    layers.push_back(2);
-    NeuralNetwork nn(layers, new Sigmoid());
-    std::vector<arma::mat> X;
+    std::vector<size_t> layers{10, 8, 5, 2};
+
+    NeuralNetwork nn(layers, new Sigmoid(), 0.01);
+    std::vector<arma::rowvec> X;
     for (size_t i = 0; i < 10; ++i)
-        X.push_back(arma::randu<arma::mat>(1,10));
+        X.push_back(arma::randu<arma::rowvec>(10));
     nn.Predict(X);
-    nn.BackProp(arma::randu<arma::mat>(1,10), arma::randu<arma::mat>(1,2));
-    nn.BackProp(arma::randu<arma::mat>(1,10), arma::randu<arma::mat>(1,2));
-    nn.BackProp(arma::randu<arma::mat>(1,10), arma::randu<arma::mat>(1,2));
-    nn.BackProp(arma::randu<arma::mat>(1,10), arma::randu<arma::mat>(1,2));
+    for (size_t i = 0; i < 100; ++i)
+        nn.BackProp(arma::randu<arma::rowvec>(10), arma::randu<arma::rowvec>(2));
     return 0;
 }
 

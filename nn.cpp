@@ -2,62 +2,66 @@
 
 #include "nn.hpp"
 
-NeuralNetwork::NeuralNetwork(std::vector<size_t> layers, Activation* a, double r)
-    : rate(r)
-    , activation(a)
+NeuralNetwork::NeuralNetwork(const std::vector<size_t>& layers, Activation* activation, double rate)
+    : mpActivation(activation)
+    , mActivation(*activation)
+    , mRate(rate)
 {
     for (size_t i = 1; i < layers.size(); ++i) {
-        neurons.push_back(arma::randu<arma::mat>(layers[i-1],layers[i]));
+        mNeurons.push_back(arma::randu<Matrix>(layers[i-1],layers[i]));
     }
 }
 
-arma::mat NeuralNetwork::PredictOne(const arma::mat& x) const {
+RowVec NeuralNetwork::PredictOne(const RowVec& x) const {
     auto py = x;
     std::cout << std::endl << py << std::endl;
-    for (auto& nm: neurons) {
-        py = (*activation)(py*nm);
+    for (auto& nm: mNeurons) {
+        py = mActivation(py*nm);
         std::cout << py << std::endl;
     }
     return py;
 }
 
-std::vector<arma::mat> NeuralNetwork::Predict(const std::vector<arma::mat>& X) const {
-    std::vector<arma::mat> result;
+std::vector<RowVec> NeuralNetwork::Predict(const std::vector<RowVec>& X) const {
+    std::vector<RowVec> result;
     for (const auto& x: X) {
         result.push_back(PredictOne(x));
     }
     return result;
 }
 
-void NeuralNetwork::BackProp(const arma::mat& x, const arma::mat& y) {
-    std::vector<arma::mat> values;
-    std::vector<arma::mat> derivs;
-    arma::mat py = ForwardProp(x, values, derivs);
-    arma::mat e = py - y;
-    assert(derivs.size() == neurons.size() + 1);
-    for (size_t i = neurons.size(); i > 0; --i) {
-        arma::mat delta = neurons[i-1];
-        for (size_t row = 0; row < delta.n_rows; ++row)
-            for (size_t col = 0; col < delta.n_cols; ++col)
-                delta(row, col) = rate * e(0, col) * derivs[i](col) * values[i-1](row);
-
+void NeuralNetwork::BackProp(const RowVec& x, const RowVec& y) {
+    std::vector<RowVec> values;
+    std::vector<RowVec> derivs;
+    Matrix py = ForwardProp(x, values, derivs);
+    Matrix e = py - y;
+    // DEBUG
+    std::cout << e << std::endl;
+    assert(derivs.size() == mNeurons.size() + 1);
+    for (size_t i = mNeurons.size(); i > 0; --i) {
+        Matrix delta = mNeurons[i-1];
+        for (size_t row = 0; row < delta.n_rows; ++row) {
+            for (size_t col = 0; col < delta.n_cols; ++col) {
+                delta(row, col) = mRate * e(0, col) * derivs[i](col) * values[i-1](row);
+            }
+        }
         e = e % derivs[i];
-        e = e * neurons[i-1].t();
-        neurons[i-1] -= delta;
+        e = e * mNeurons[i-1].t();
+        mNeurons[i-1] -= delta;
     }
 }
 
-
-arma::mat NeuralNetwork::ForwardProp(const arma::mat& x, std::vector<arma::mat>& values, std::vector<arma::mat>& derivs) const {
-    const arma::mat fake;
-    auto py = x;
+RowVec NeuralNetwork::ForwardProp(const RowVec& x, std::vector<RowVec>& values, std::vector<RowVec>& derivs) const {
+    const Matrix fake;
+    RowVec py = x;
     derivs.push_back(fake);
     values.push_back(x);
 
-    for (auto& nm: neurons) {
-        derivs.push_back(activation->Deriv(py*nm));
-        py = (*activation)(py*nm);
+    for (auto& nm: mNeurons) {
+        derivs.push_back(mActivation.Deriv(py*nm));
+        py = mActivation(py*nm);
         values.push_back(py);
     }
+
     return py;
 }

@@ -3,20 +3,22 @@
 #include <memory>
 #include <vector>
 
-#include <armadillo>
-
+#include "aliases.hpp"
 #include "activations.hpp"
+
 
 class NeuralNetwork {
 public:
-    NeuralNetwork(std::vector<size_t> layers, Activation* a, double r = 0.1);
+    NeuralNetwork(const std::vector<size_t>& layers, Activation* activation, double rate = 0.1);
+    NeuralNetwork(const std::string& fname);
     ~NeuralNetwork() {}
-    arma::mat ForwardProp(const arma::mat& x, std::vector<arma::mat> &values, std::vector<arma::mat> &derivs) const;
-    void BackProp(const arma::mat& x, const arma::mat& y);
-    arma::mat PredictOne(const arma::mat& x) const;
-    std::vector<arma::mat> Predict(const std::vector<arma::mat>& X) const;
+    RowVec ForwardProp(const RowVec& x, std::vector<RowVec> &values, std::vector<RowVec> &derivs) const;
+    void BackProp(const RowVec &x, const RowVec &y);
+    RowVec PredictOne(const RowVec& x) const;
+    std::vector<RowVec> Predict(const std::vector<RowVec>& X) const;
 private:
-    const double rate;
-    std::vector<arma::mat> neurons;
-    std::unique_ptr<Activation> activation;
+    std::vector<Matrix> mNeurons;
+    const std::unique_ptr<Activation> mpActivation;
+    const Activation& mActivation;
+    const double mRate;
 };
