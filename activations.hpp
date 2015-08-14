@@ -3,6 +3,9 @@
 #include <aliases.hpp>
 
 
+/**
+ *  \brief Activation interface class
+ */
 class Activation {
 public:
     virtual ~Activation()
@@ -14,26 +17,37 @@ public:
 };
 
 
+/**
+ *  \brief Sigmoid activation class
+ */
 class Sigmoid: public Activation {
 public:
     Sigmoid() {}
     ~Sigmoid() {}
     double operator()(const double value) const;
     Matrix operator()(const Matrix& value) const;
-    double Deriv(const double x) const;
+    double Deriv(const double value) const;
     Matrix Deriv(const Matrix& value) const;
 };
 
 
+/**
+ *  \brief Identity activation class
+ */
 class Identity: public Activation {
 public:
     Identity() {}
     ~Identity() {}
     double operator()(const double value) const;
     Matrix operator()(const Matrix& value) const;
-    double Deriv(const double x) const;
+    double Deriv(const double value) const;
     Matrix Deriv(const Matrix& value) const;
 };
 
 
+/**
+ *  \brief Activation factory
+ *  \param[in] actName activation function name, may be "sigmoid", "identity", otherwise exception
+ *  \return pointer to activation functor
+ */
 Activation* make_activation(const std::string& actName);

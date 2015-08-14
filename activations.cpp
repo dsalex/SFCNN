@@ -3,8 +3,8 @@
 #include "activations.hpp"
 
 
-double Sigmoid::operator()(const double x) const {
-    return 1.0 / (1.0 + exp(-x));
+double Sigmoid::operator()(const double value) const {
+    return 1.0 / (1.0 + exp(-value));
 }
 
 Matrix Sigmoid::operator()(const Matrix& value) const {
@@ -15,8 +15,8 @@ Matrix Sigmoid::operator()(const Matrix& value) const {
     return result;
 }
 
-double Sigmoid::Deriv(const double x) const {
-    const double sigmoid = (*this)(x);
+double Sigmoid::Deriv(const double value) const {
+    const double sigmoid = (*this)(value);
     return sigmoid * (1 - sigmoid);
 }
 
@@ -29,20 +29,20 @@ Matrix Sigmoid::Deriv(const Matrix& value) const {
 }
 
 
-double Identity::operator()(const double x) const {
-    return x;
+double Identity::operator()(const double value) const {
+    return value;
 }
 
 Matrix Identity::operator()(const Matrix& value) const {
     return value;
 }
 
-double Identity::Deriv(const double x) const {
-    return x;
+double Identity::Deriv(const double value) const {
+    return 1.0;
 }
 
 Matrix Identity::Deriv(const Matrix& value) const {
-    return value;
+    return arma::ones(value.n_rows, value.n_cols);
 }
 
 
