@@ -2,21 +2,23 @@
 
 #include "activations.hpp"
 
+const std::string Sigmoid::mName = "sigmoid";
+const std::string Identity::mName = "identity";
 
-double Sigmoid::operator()(const double value) const {
+double Sigmoid::Value(const double value) const {
     return 1.0 / (1.0 + exp(-value));
 }
 
-Matrix Sigmoid::operator()(const Matrix& value) const {
+Matrix Sigmoid::Value(const Matrix& value) const {
     auto result = value;
     for (int i = 0; i < result.n_rows; ++i)
         for (int j = 0; j < result.n_cols; ++j)
-            result(i, j) = (*this)(value(i, j));
+            result(i, j) = this->Value(value(i, j));
     return result;
 }
 
 double Sigmoid::Deriv(const double value) const {
-    const double sigmoid = (*this)(value);
+    const double sigmoid = this->Value(value);
     return sigmoid * (1 - sigmoid);
 }
 
@@ -29,11 +31,11 @@ Matrix Sigmoid::Deriv(const Matrix& value) const {
 }
 
 
-double Identity::operator()(const double value) const {
+double Identity::Value(const double value) const {
     return value;
 }
 
-Matrix Identity::operator()(const Matrix& value) const {
+Matrix Identity::Value(const Matrix& value) const {
     return value;
 }
 
@@ -46,11 +48,11 @@ Matrix Identity::Deriv(const Matrix& value) const {
 }
 
 
-Activation* make_activation(const std::string& actName) {
+std::unique_ptr<Activation> make_activation(const std::string& actName) {
     if (actName == "sigmoid") {
-        return new Sigmoid();
+        return std::unique_ptr<Activation>(new Sigmoid());
     } else if (actName == "identity") {
-        return new Identity();
+        return std::unique_ptr<Activation>(new Identity());
     } else {
         throw std::logic_error("Unknown activation function name");
     }

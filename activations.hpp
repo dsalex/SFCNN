@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <aliases.hpp>
 
 
@@ -10,8 +12,9 @@ class Activation {
 public:
     virtual ~Activation()
     {}
-    virtual double operator()(const double value) const = 0;
-    virtual Matrix operator()(const Matrix& value) const = 0;
+    virtual const std::string& Name() = 0;
+    virtual double Value(const double value) const = 0;
+    virtual Matrix Value(const Matrix& value) const = 0;
     virtual double Deriv(double value) const = 0;
     virtual Matrix Deriv(const Matrix& value) const = 0;
 };
@@ -24,10 +27,13 @@ class Sigmoid: public Activation {
 public:
     Sigmoid() {}
     ~Sigmoid() {}
-    double operator()(const double value) const;
-    Matrix operator()(const Matrix& value) const;
+    const std::string& Name() { return mName; }
+    double Value(const double value) const;
+    Matrix Value(const Matrix& value) const;
     double Deriv(const double value) const;
     Matrix Deriv(const Matrix& value) const;
+private:
+    static const std::string mName;
 };
 
 
@@ -38,10 +44,13 @@ class Identity: public Activation {
 public:
     Identity() {}
     ~Identity() {}
-    double operator()(const double value) const;
-    Matrix operator()(const Matrix& value) const;
+    const std::string& Name() { return mName; }
+    double Value(const double value) const;
+    Matrix Value(const Matrix& value) const;
     double Deriv(const double value) const;
     Matrix Deriv(const Matrix& value) const;
+private:
+    static const std::string mName;
 };
 
 
@@ -50,4 +59,4 @@ public:
  *  \param[in] actName activation function name, may be "sigmoid", "identity", otherwise exception
  *  \return pointer to activation functor
  */
-Activation* make_activation(const std::string& actName);
+std::unique_ptr<Activation> make_activation(const std::string& actName);
