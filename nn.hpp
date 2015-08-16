@@ -58,6 +58,9 @@ public:
     /// \return
     ///
     std::vector<RowVec> Predict(const std::vector<RowVec>& X) const;
+public:
+    size_t XSize;
+    size_t YSize;
 private:
     std::vector<Matrix> mNeurons;
     std::unique_ptr<Activation> mActivation;

@@ -10,14 +10,16 @@ NeuralNetwork::NeuralNetwork(const std::vector<size_t>& layers, std::unique_ptr<
     for (size_t i = 1; i < layers.size(); ++i) {
         mNeurons.push_back((arma::randu<Matrix>(layers[i-1],layers[i]) - 0.5) / layers[i-1]);
     }
+    XSize = layers.front();
+    YSize = layers.back();
 }
 
 RowVec NeuralNetwork::PredictOne(const RowVec& x) const {
     auto py = x;
-    std::cout << std::endl << py << std::endl;
+    //std::cout << std::endl << py << std::endl;
     for (auto& nm: mNeurons) {
         py = mActivation->Value(py*nm);
-        std::cout << py << std::endl;
+        //std::cout << py << std::endl;
     }
     return py;
 }
@@ -123,4 +125,6 @@ NeuralNetwork::NeuralNetwork(const std::string& fname, bool isDump)
             mNeurons.push_back((arma::randu<Matrix>(layers[i-1],layers[i]) - 0.5) / layers[i-1]);
         }
     }
+    XSize = mNeurons.front().n_rows;
+    YSize = mNeurons.back().n_cols;
 }
