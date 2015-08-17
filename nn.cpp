@@ -14,7 +14,7 @@ NeuralNetwork::NeuralNetwork(const std::vector<size_t>& layers, std::unique_ptr<
     YSize = layers.back();
 }
 
-RowVec NeuralNetwork::PredictOne(const RowVec& x) const {
+RowVec NeuralNetwork::Predict(const RowVec& x) const {
     auto py = x;
     //std::cout << std::endl << py << std::endl;
     for (auto& nm: mNeurons) {
@@ -24,22 +24,15 @@ RowVec NeuralNetwork::PredictOne(const RowVec& x) const {
     return py;
 }
 
-std::vector<RowVec> NeuralNetwork::Predict(const std::vector<RowVec>& X) const {
-    std::vector<RowVec> result;
-    for (const auto& x: X) {
-        result.push_back(PredictOne(x));
-    }
-    return result;
-}
-
-void NeuralNetwork::BackProp(const RowVec& x, const RowVec& y) {
+std::vector<Matrix> NeuralNetwork::BackProp(const RowVec& x, const RowVec& y) {
     std::vector<RowVec> values;
     std::vector<RowVec> derivs;
+    std::vector<Matrix> deltas;
     Matrix py = ForwardProp(x, values, derivs);
     Matrix e = py - y;
     // DEBUG
-    std::cout << arma::dot(e, e) << std::endl;
-    std::cout << e << std::endl;
+    //std::cout << arma::dot(e, e) << std::endl;
+    //std::cout << e << std::endl;
     assert(derivs.size() == mNeurons.size() + 1);
     for (size_t i = mNeurons.size(); i > 0; --i) {
         Matrix delta = mNeurons[i-1];
@@ -50,9 +43,22 @@ void NeuralNetwork::BackProp(const RowVec& x, const RowVec& y) {
         }
         e = e % derivs[i];
         e = e * mNeurons[i-1].t();
-        mNeurons[i-1] -= delta;
+        //mNeurons[i-1] -= delta;
+        deltas.push_back(std::move(delta));
         //std::cout << "DELTA " << i << " : " << delta << std::endl;
     }
+    return deltas;
+}
+
+void NeuralNetwork::UpdateWeights(std::vector<Matrix> deltas) {
+    assert(deltas.size() == mNeurons.size());
+    for (size_t i = 0; i < deltas.size(); ++i) {
+        mNeurons[i] -= deltas[i];
+    }
+}
+
+void NeuralNetwork::Train(const RowVec& x, const RowVec& y) {
+    UpdateWeights(BackProp(x, y));
 }
 
 RowVec NeuralNetwork::ForwardProp(const RowVec& x, std::vector<RowVec>& values, std::vector<RowVec>& derivs) const {

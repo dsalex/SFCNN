@@ -45,19 +45,24 @@ public:
     /// \param x
     /// \param y
     ///
-    void BackProp(const RowVec& x, const RowVec& y);
+    std::vector<Matrix> BackProp(const RowVec& x, const RowVec& y);
     ///
-    /// \brief PredictOne
+    /// \brief UpdateWeights
+    /// \param deltas
+    ///
+    void UpdateWeights(std::vector<Matrix> deltas);
+    ///
+    /// \brief Train make training step with one example
+    /// \param x
+    /// \param y
+    ///
+    void Train(const RowVec& x, const RowVec& y);
+    ///
+    /// \brief Predict one example
     /// \param x
     /// \return
     ///
-    RowVec PredictOne(const RowVec& x) const;
-    ///
-    /// \brief Predict
-    /// \param X
-    /// \return
-    ///
-    std::vector<RowVec> Predict(const std::vector<RowVec>& X) const;
+    RowVec Predict(const RowVec& x) const;
 public:
     size_t XSize;
     size_t YSize;

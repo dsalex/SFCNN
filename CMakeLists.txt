@@ -8,5 +8,6 @@ FILE(GLOB_RECURSE SRC_ALL "*.c*")
 include_directories(".")
 aux_source_directory(. SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST} ${INC_ALL} ${SRC_ALL})
+#add_library(${PROJECT_NAME} SHARED ${SRC_LIST} ${INC_ALL} ${SRC_ALL})
 target_link_libraries(${PROJECT_NAME} ${ARMADILLO_LIBRARIES})
 
