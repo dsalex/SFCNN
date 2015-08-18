@@ -57,6 +57,18 @@ void NeuralNetwork::UpdateWeights(std::vector<Matrix> deltas) {
     }
 }
 
+void NeuralNetwork::SetNeurons(std::vector<Matrix> neurons) {
+    assert(neurons.size() == mNeurons.size());
+    for (size_t i = 0; i < neurons.size(); ++i) {
+        mNeurons[i] = neurons[i];
+    }
+}
+
+
+const std::vector<Matrix>& NeuralNetwork::GetNeurons() const {
+    return mNeurons;
+}
+
 void NeuralNetwork::Train(const RowVec& x, const RowVec& y) {
     UpdateWeights(BackProp(x, y));
 }

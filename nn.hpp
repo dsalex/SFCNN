@@ -57,6 +57,8 @@ public:
     /// \param y
     ///
     void Train(const RowVec& x, const RowVec& y);
+    const std::vector<Matrix>& GetNeurons() const;
+    void SetNeurons(std::vector<Matrix> neurons);
     ///
     /// \brief Predict one example
     /// \param x
