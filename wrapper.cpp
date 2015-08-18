@@ -12,8 +12,8 @@
 
 void ArmaToNumPy(const std::vector<Matrix>& armas, bp::list& nps) {
     for (const Matrix& armaDelta: armas) {
-        const bp::tuple shape = bp::make_tuple(armaDelta.n_rows, armaDelta.n_cols);
-        auto npDelta = np::empty(shape, np::dtype::get_builtin<double>());
+        Py_intptr_t shape[2] = { armaDelta.n_rows, armaDelta.n_cols };
+        auto npDelta = np::zeros(2, shape, np::dtype::get_builtin<double>());
         NumPyArrayData<double> npDeltaData(npDelta);
         for (size_t row = 0; row < armaDelta.n_rows; ++row) {
             for (size_t col = 0; col < armaDelta.n_cols; ++col) {
@@ -90,10 +90,8 @@ void PyNN::SetNeurons(const bp::list& neurons) {
 
 
 bp::list PyNN::GetNeurons() const {
-    std::cout << "<GetNeurons>n";
     bp::list npNeurons;
     ArmaToNumPy(NN->GetNeurons(), npNeurons);
-    std::cout << "</GetNeurons>n";
     return npNeurons;
 }
 
@@ -102,6 +100,7 @@ bp::list PyNN::GetNeurons() const {
 BOOST_PYTHON_MODULE(libSFCNN)
 {
     using namespace boost::python;
+    boost::numpy::initialize();
     class_<PyNN>("NN", init<>())
         .def("FromConfig", &PyNN::FromConfig)
         .def("FromDump", &PyNN::FromDump)

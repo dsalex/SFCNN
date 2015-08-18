@@ -1,7 +1,13 @@
 #pragma once
 
+#include <boost/python.hpp>
+#include <boost/numpy.hpp>
+
+
 namespace bp = boost::python;
 namespace np = boost::numpy;
+
+class NeuralNetwork;
 
 class PyNN {
 public:
